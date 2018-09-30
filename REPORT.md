@@ -44,42 +44,6 @@
 них содержится обязательная информация об их имени и пола(ключи name, sex) и если у них есть дети, то дополнительно добавляется ключ child.
 Таким образом получим некоторое подобие базы данных/таблицы, где обратившись по уникальному id человека можно узнать о нем соответсвующую информацию
 
-f = open('tree.ged', encoding='utf-8')
-FamilyList = {}
-Person = dict.fromkeys(['name', 'sex']) 
- 
-for line in f: - построчно обрабатывает текстовый файл
-    parts = line.split() - каждую строчку делим на части по пробелам и копируем в список 
-    if parts[0] == '0' and parts[-1] == 'INDI': - 0 и INDI в файле gedcom означают начало описания участника дерева. 
-        key = parts[1]  - между ними лежит id человека
-        FamilyList[key] = dict.copy(Person) - добавляем его в список
-    if parts[0] == '1' and parts[1] == 'NAME': - и заполняем
-        Person['name'] = parts[2]
-    if parts[0] == '1' and parts[1] == 'SEX':
-        Person['sex'] = parts[2]
-        FamilyList[key] = dict.copy(Person) - в конце переносим собранную инфу по ключу-id этого человека
-    if parts[0] == '0' and parts[-1] == 'FAM': - вторая часть файла состоит из информации о семьях 0 и FAM означают начало описания семьи
-        keys = [] - создаем список ключей-id
-    if parts[0] == '1' and parts[1] == 'HUSB':# добавляем id жены и мужа в список keys
-        keys.append(parts[-1])
-    if parts[0] == '1' and parts[1] == 'WIFE':
-        keys.append(parts[-1])
-    if parts[0] == '1' and parts[1] == 'CHIL':
-        child = (FamilyList[parts[2]]['name'])#по id ребенка находим его имя и присваиваем переменной child
-        for i in keys:                        
-            if 'children' not in FamilyList[i]:#по id мужа и жены добавляем ключ children(если его нет)
-                FamilyList[i]['children'] = list()#по ключу хранится список(так как детей может быть много)
-            FamilyList[i]['children'].append(child) #добавляем имя найденного ребенка в children
-f.close()
-output = open('tree.pl', 'w', encoding='utf-8')#далее записываем информацию в файл .pl в виде предикатов согласно заданию
-for i in FamilyList.keys():
-    if 'children' in FamilyList[i]:
-        for x in FamilyList[i]['children']:
-            if FamilyList[i]['sex'] == 'M':
-                output.write("father(" + FamilyList[i]['name'].lower() + "," + x.lower() + ").\n")
-            else:
-                output.write("mother(" + FamilyList[i]['name'].lower() + "," + x.lower() + ").\n")
-output.close()
 
 
 ## Предикат поиска родственника
